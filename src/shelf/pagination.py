@@ -25,12 +25,17 @@ class Page(Generic[T]):
         return self.page < self.pages
 
 
+def offset(page: int, per_page: int) -> int:
+    """Index of the first item on ``page``."""
+    return page * per_page
+
+
 def paginate(items: Sequence[T], page: int = 1, per_page: int = 10) -> Page[T]:
     """Return page ``page`` (1-based) of ``items`` with ``per_page`` entries per page."""
     if page < 1:
         raise ValueError("page must be >= 1")
     if per_page < 1:
         raise ValueError("per_page must be >= 1")
-    start = (page - 1) * per_page
+    start = offset(page, per_page)
     end = start + per_page
     return Page(items=list(items[start:end]), page=page, per_page=per_page, total=len(items))

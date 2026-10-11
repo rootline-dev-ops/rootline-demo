@@ -1,0 +1,23 @@
+# .github/workflows/rootline.yml
+# Runs after the CI workflow finishes; analyses it only when it failed.
+name: Rootline
+
+on:
+  workflow_run:
+    workflows: ["CI"]          # name(s) of the workflow(s) to watch
+    types: [completed]
+
+permissions:
+  actions: read                # read runs, jobs and logs
+  contents: read               # read files and the workflow YAML at the tested commit
+  pull-requests: write         # create/update the single Rootline comment
+
+jobs:
+  analyse:
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rootline-dev-ops/rootline@v0
+        with:
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic-workspace-id: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}  # only needed for multi-workspace keys
